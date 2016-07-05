@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include "Linked_list.h"
+#include "password_generator.h"
 
 /**
  *  print_list: This is used as a function pointer to be passed to traverse in
@@ -57,12 +58,12 @@ void print_list(void *data)
 List extracted_text_data(List self)
 {
     const unsigned short buffer_size = 31;
-    size_t len;
-    
+    size_t len;    
+
     char buffer[buffer_size];
 
     // TODO: prompt user for text location.
-    FILE *fp = fopen("./test.txt", "r");
+    FILE *fp = fopen("./input.text", "r");
 
     if (fp == NULL) {
         perror("File error");
@@ -76,7 +77,7 @@ List extracted_text_data(List self)
         if(buffer[len] == '\n') {
             buffer[len] = '\0';
         }
-        self = insert(self, (void *) buffer, len + 1);
+        self = insert(self, (void *) format_string(buffer, len), len);
     }
     fclose(fp);
 
@@ -90,7 +91,7 @@ int main(void)
     new_list = extracted_text_data(new_list);
 
     traverse(new_list, &print_list);
-    printf("%d\n", number_of_nodes(new_list));
+    printf("DEBUG NUMBER OF NODES: %d\n", number_of_nodes(new_list));
 
     return EXIT_SUCCESS;
 }
