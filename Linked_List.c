@@ -35,7 +35,7 @@ static List node_init(void *data, size_t size)
         exit(EXIT_FAILURE);
     }
 
-    new_node->data = malloc(sizeof(*new_node->data) * size);
+    new_node->data = malloc(sizeof(size));
 
     if (new_node->data == NULL) {
         fprintf(stderr, "Error: allocating memory for data\n");
