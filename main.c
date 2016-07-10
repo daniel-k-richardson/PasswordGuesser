@@ -30,8 +30,8 @@
  */
 
 #include <stdio.h>
-#include "Linked_list.h"
-#include "password_generator.h"
+#include "linked_list.h"
+
 
 /**
  *  print_list: This is used as a function pointer to be passed to traverse in
@@ -47,6 +47,14 @@ void print_list(void *data)
     puts((char *) data);
 }
 
+bool search_match(void *target, void *data)
+{
+    if (strcmp((char *) target, (char *) data) == 0) {
+        return true;
+    }
+    return false;
+}
+
 /**
  *  extracted_text_data: opens a text file. Reads each line, adding those words
  *  to the linked list as new nodes.
@@ -57,41 +65,70 @@ void print_list(void *data)
  */
 List extracted_text_data(List self)
 {
-    const unsigned short buffer_size = 31;
-    size_t len;    
-
+    const unsigned buffer_size = 31;
+    size_t size_of_input_string = 0;
     char buffer[buffer_size];
+    FILE *fp = NULL;
 
     // TODO: prompt user for text location.
-    FILE *fp = fopen("./input.text", "r");
-
-    if (fp == NULL) {
+    if ((fp = fopen("./input.text", "r")) == NULL) {
         perror("File error");
         exit(EXIT_FAILURE);
     }
-    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-        len = strlen(buffer) - 1;
 
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        size_of_input_string = strlen(buffer) - 1;
         // need to remove newline characters at the end, otherwise
         // causes issues when traversing through the data in the linked list.
-        if(buffer[len] == '\n') {
-            buffer[len] = '\0';
+        if(buffer[size_of_input_string] == '\n') {
+            buffer[size_of_input_string] = '\0';
         }
-        self = insert(self, (void *) format_string(buffer, len), len);
+        self = insert(self, (void *) buffer, size_of_input_string);
     }
     fclose(fp);
 
     return self;
 }
 
+
 int main(void)
 {
-    List new_list = NULL;
+    List new_list = linked_list_init();
 
+    //new_list = string_format()
     new_list = extracted_text_data(new_list);
 
+    char *name = "Happy Bunny";
+
+    traverse(new_list, &print_list);
+    printf("DEBUG NUMBER OF NODES: %d\n", number_of_nodes(new_list));
+
+    new_list = delete_item(new_list, (void *) name, &search_match);
     traverse(new_list, &print_list);
     printf("DEBUG NUMBER OF NODES: %d\n", number_of_nodes(new_list));
 
     return EXIT_SUCCESS;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

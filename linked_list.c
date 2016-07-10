@@ -7,7 +7,7 @@
  *  purposes of the current project and is its the first iterations.
  */
 
-#include "Linked_List.h"
+#include "linked_list.h"
 
 // DTA for the linked-list.
 struct Node {
@@ -15,7 +15,32 @@ struct Node {
     struct Node *next;
 };
 
-static void free_node_memory(List self);
+typedef struct Node *Node;
+
+struct Linked_List {
+    Node head;
+    Node tail;
+};
+
+
+void free_node_memory(Node self);
+
+/**
+ *  //TODO ADD SOME COMMENTS.
+ */
+List linked_list_init()
+{
+    List new_list = NULL;
+
+    if ((new_list = malloc(sizeof(*new_list))) == NULL) {
+        perror("Error: allocating memory for List\n");
+        exit(EXIT_FAILURE);
+    }
+    new_list->head = NULL;
+    new_list->tail = NULL;
+
+    return new_list;
+}
 
 /**
  *  node_init: creates a new_node in memory then creates memory for the data
@@ -26,23 +51,21 @@ static void free_node_memory(List self);
  *
  *  Returns: A new_node that has been initialised back to the caller.
  */
-static List node_init(void *data, size_t size)
+Node node_init(void *data, size_t size)
 {
-    List new_node = malloc(sizeof(*new_node));
+    Node new_node = NULL;
 
-    if (new_node == NULL) {
-        fprintf(stderr, "Error: allocating memory for new node.\n");
+    if ((new_node = malloc(sizeof(*new_node))) == NULL) {
+        perror("Error: allocating memory for node\n");
         exit(EXIT_FAILURE);
     }
 
-    new_node->data = malloc(sizeof(size));
-
-    if (new_node->data == NULL) {
-        fprintf(stderr, "Error: allocating memory for data\n");
+    if ((new_node->data = malloc(sizeof(size))) == NULL){
+        perror("Error: allocating memory for data\n");
         exit(EXIT_FAILURE);
     }
+
     memcpy(new_node->data, data, size);
-
     new_node->next = NULL;
 
     return new_node;
@@ -59,11 +82,15 @@ static List node_init(void *data, size_t size)
  */
 List insert(List self, void *data, size_t size)
 {
-    List node_to_add = node_init(data, size);
+    Node node_to_add = node_init(data, size);
 
-    node_to_add->next = self;
-    self = node_to_add;
-
+    if (self->head == NULL) {
+        self->head = node_to_add;
+        self->tail = self->head;
+    } else {
+        self->tail->next = node_to_add;
+        self->tail = self->tail->next;
+    }
     return self;
 }
 
@@ -81,17 +108,16 @@ List insert(List self, void *data, size_t size)
  */
 List delete_item(List self, void *target, bool (*search)(void *target, void *data))
 {
-    List current = self;
-    List previous = NULL;
+    Node current = self->head;
+    Node previous = NULL;
 
     while (current != NULL) {
         if (search(target, current->data)) {
             if (previous == NULL) {
-                self = current->next;
+                self->head = current->next;
                 free_node_memory(current);
-
             } else {
-                previous->next = current->next;
+                previous = current->next;
                 free_node_memory(current);
                 current = previous->next;
             }
@@ -110,10 +136,11 @@ List delete_item(List self, void *target, bool (*search)(void *target, void *dat
  *
  *  Returns: void.
  */
-static void free_node_memory(List self)
+void free_node_memory(Node self)
 {
     free(self->data);
     free(self);
+    self->data = NULL;
     self = NULL;
 }
 
@@ -129,7 +156,7 @@ static void free_node_memory(List self)
  */
 void traverse(List self, void (*print)(void *data))
 {
-    List current = self;
+    Node current = self->head;
 
     while (current != NULL) {
         print(current->data);
@@ -148,7 +175,7 @@ int number_of_nodes(List self)
 {
     int counter = 0;
 
-    List current = self;
+    Node current = self->head;
     while (current != NULL) {
         counter++;
         current = current->next;

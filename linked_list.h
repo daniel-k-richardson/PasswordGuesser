@@ -14,8 +14,10 @@
 #include <string.h>
 #include <stdbool.h>
 
-typedef struct Node *List;
 
+typedef struct Linked_List *List;
+
+List linked_list_init();
 List insert(List self, void *data, size_t size);
 List delete_item(List self, void *target, bool (*search)(void *target, void *data));
 void traverse(List self, void (*print)(void *));

@@ -4,6 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-char *format_string(char str[], const int  str_len);
+char *format_string(char str[], const size_t  str_len);
 
 #endif
